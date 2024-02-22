@@ -4,7 +4,9 @@
  */
 package smallinventorysystem;
 
+import java.util.Random;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,8 +17,11 @@ public class Category extends javax.swing.JFrame {
     /**
      * Creates new form menuFrame
      */
+    DefaultTableModel model;
+
     public Category() {
         initComponents();
+        model = (DefaultTableModel) tableCategory.getModel();
     }
 
     /**
@@ -34,9 +39,9 @@ public class Category extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableCategory = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        fieldCategory = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -87,23 +92,33 @@ public class Category extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tableCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "ID", "CATEGORY"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tableCategory.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableCategoryMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tableCategory);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("CATEGORY NAME");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        fieldCategory.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/mini_downloadcheckicon.png"))); // NOI18N
@@ -129,6 +144,11 @@ public class Category extends javax.swing.JFrame {
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/mini_downloadediticon.png"))); // NOI18N
         jButton3.setText("EDIT");
         jButton3.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/mini_downloadleaveicon.png"))); // NOI18N
@@ -162,7 +182,7 @@ public class Category extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jTextField1)
+                            .addComponent(fieldCategory)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addGap(0, 0, Short.MAX_VALUE)))
@@ -183,7 +203,7 @@ public class Category extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(fieldCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton2)
@@ -225,13 +245,45 @@ public class Category extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-                JOptionPane.showMessageDialog(this, "CATEGORY ADDED SUCCESSFULY", "Message", JOptionPane.INFORMATION_MESSAGE);
+        Random ran = new Random();
+        int id = Math.abs((ran.nextInt() / 2) * 2);
+        if (!fieldCategory.getText().isEmpty()) {
+
+            model.addRow(new Object[]{id, fieldCategory.getText()});
+            JOptionPane.showMessageDialog(this, "CATEGORY ADDED SUCCESSFULY", "Message", JOptionPane.INFORMATION_MESSAGE);
+            fieldCategory.setText(null);
+        }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        JOptionPane.showConfirmDialog(this, "ARE YOU SURE YOU WANT TO DELETE THIS DATA?", "Message", JOptionPane.YES_NO_OPTION);
+        int choice = JOptionPane.showConfirmDialog(this, "ARE YOU SURE YOU WANT TO DELETE THIS DATA?", "Message", JOptionPane.YES_NO_OPTION);
+
+        if (choice == 0) {
+            model.removeRow(tableCategory.getSelectedRow());
+        }
+//        System.out.println(tableCategory.getSelectedRow());
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void tableCategoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableCategoryMouseClicked
+        // TODO add your handling code here:
+        String categoryName = model.getValueAt(tableCategory.getSelectedRow(), 1).toString();
+
+        fieldCategory.setText(categoryName);
+    }//GEN-LAST:event_tableCategoryMouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        if (!fieldCategory.getText().isEmpty()) {
+            int selected = tableCategory.getSelectedRow();
+            
+            tableCategory.setValueAt(fieldCategory.getText(), selected, 1);
+
+        JOptionPane.showMessageDialog(this, "CATEGORY ADDED SUCCESSFULY", "Message", JOptionPane.INFORMATION_MESSAGE);
+         fieldCategory.setText(null);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -272,6 +324,7 @@ public class Category extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField fieldCategory;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -285,7 +338,6 @@ public class Category extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTable tableCategory;
     // End of variables declaration//GEN-END:variables
 }
